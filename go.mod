@@ -1,4 +1,4 @@
-module github.com/rdeusser/architect
+module github.com/rdeusser/please
 
 go 1.13
 

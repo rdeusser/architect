@@ -112,7 +112,7 @@ func printNode(f *syntax.File, name string) (string, error) {
 	})
 
 	if len(b.String()) == 0 {
-		return "not provided", nil
+		return "usage not provided", nil
 	}
 
 	v, err := strconv.Unquote(b.String())

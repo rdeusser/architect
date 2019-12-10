@@ -7,15 +7,15 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"github.com/rdeusser/architect/pkg/shell"
-	"github.com/rdeusser/architect/pkg/version"
+	"github.com/rdeusser/please/pkg/shell"
+	"github.com/rdeusser/please/pkg/version"
 )
 
 var debug bool
 
 func main() {
 	cmd := &cobra.Command{
-		Use:   "architect",
+		Use:   "plz",
 		Short: "A shell script-based build tool",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			logrus.SetOutput(colorable.NewColorableStdout())
@@ -28,9 +28,6 @@ func main() {
 	}
 
 	cmd.PersistentFlags().BoolVar(&debug, "debug", false, "Show debug logs")
-
-	cobra.OnInitialize(func() {
-	})
 
 	commands, err := shell.Commands()
 	if err != nil {

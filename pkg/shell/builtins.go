@@ -3,10 +3,10 @@ package shell
 import (
 	"mvdan.cc/sh/v3/interp"
 
-	"github.com/rdeusser/architect/pkg/shell/builtins/git"
-	"github.com/rdeusser/architect/pkg/shell/builtins/log"
-	"github.com/rdeusser/architect/pkg/shell/builtins/os"
-	"github.com/rdeusser/architect/pkg/shell/builtins/project"
+	"github.com/rdeusser/please/pkg/shell/builtins/git"
+	"github.com/rdeusser/please/pkg/shell/builtins/log"
+	"github.com/rdeusser/please/pkg/shell/builtins/os"
+	"github.com/rdeusser/please/pkg/shell/builtins/project"
 )
 
 var builtins = flattenModules(
