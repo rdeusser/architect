@@ -10,13 +10,37 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"mvdan.cc/sh/v3/expand"
 	"mvdan.cc/sh/v3/interp"
 	"mvdan.cc/sh/v3/syntax"
+
+	"github.com/rdeusser/please/pkg/shell/builtins/git"
+	"github.com/rdeusser/please/pkg/shell/builtins/log"
+	"github.com/rdeusser/please/pkg/shell/builtins/project"
+	"github.com/rdeusser/please/pkg/shell/builtins/system"
 )
+
+var allBuiltins = []map[string]interp.ExecHandlerFunc{
+	git.Funcs,
+	log.Funcs,
+	project.Funcs,
+	system.Funcs,
+}
+
+var builtins = make(map[string]interp.ExecHandlerFunc)
+
+func init() {
+	// Loop over all builtins and flatten them to a single map.
+	for _, m := range allBuiltins {
+		for k, v := range m {
+			builtins[k] = v
+		}
+	}
+}
 
 // Commands builds a command list from shell scripts and turns them into cobra commands.
 func Commands() ([]*cobra.Command, error) {
@@ -61,7 +85,7 @@ func Commands() ([]*cobra.Command, error) {
 					interp.StdIO(nil, os.Stdout, os.Stdout),
 					interp.Dir(repoRoot),
 					interp.Env(expand.ListEnviron(os.Environ()...)),
-					interp.WithExecModules(builtins...),
+					interp.ExecHandler(execHandler),
 				)
 				if err != nil {
 					return err
@@ -82,6 +106,13 @@ func Commands() ([]*cobra.Command, error) {
 	}
 
 	return commands, nil
+}
+
+func execHandler(ctx context.Context, args []string) error {
+	if fn := builtins[args[0]]; fn != nil {
+		return fn(context.TODO(), args[1:])
+	}
+	return interp.DefaultExecHandler(2*time.Second)(ctx, args)
 }
 
 // commandName takes a path to a script in the scripts directory and returns what the command name should be without
