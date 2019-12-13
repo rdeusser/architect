@@ -3,7 +3,6 @@ package project
 import (
 	"bytes"
 	"context"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -14,22 +13,30 @@ import (
 // Funcs provides project-specific builtins to the interpreter.
 var Funcs = map[string]interp.ExecHandlerFunc{
 	"project::root": func(ctx context.Context, args []string) error {
+		hc := interp.HandlerCtx(ctx)
+
 		out, err := exec.Command("git", "rev-parse", "--show-toplevel").Output()
 		if err != nil {
 			return err
 		}
-		_, err = os.Stdout.Write(bytes.TrimSpace(out))
+
+		_, err = hc.Stdout.Write(bytes.TrimSpace(out))
 		return err
 	},
 	"project::name": func(ctx context.Context, args []string) error {
+		hc := interp.HandlerCtx(ctx)
+
 		repo, err := gitRepo()
 		if err != nil {
 			return err
 		}
-		_, err = os.Stdout.Write([]byte(filepath.Base(repo)))
+
+		_, err = hc.Stdout.Write([]byte(filepath.Base(repo)))
 		return err
 	},
 	"project::repo": func(ctx context.Context, args []string) error {
+		hc := interp.HandlerCtx(ctx)
+
 		out, err := exec.Command("go", "list", "-m").Output()
 		if err != nil {
 			return err
@@ -42,13 +49,14 @@ var Funcs = map[string]interp.ExecHandlerFunc{
 			if err != nil {
 				return err
 			}
-			_, err = os.Stdout.Write([]byte(repo))
+			_, err = hc.Stdout.Write([]byte(repo))
 			if err != nil {
 				return err
 			}
 			return nil
 		}
-		_, err = os.Stdout.Write(bytes.TrimSpace(out))
+
+		_, err = hc.Stdout.Write(bytes.TrimSpace(out))
 		return err
 	},
 }

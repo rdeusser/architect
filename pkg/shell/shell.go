@@ -110,7 +110,7 @@ func Commands() ([]*cobra.Command, error) {
 
 func execHandler(ctx context.Context, args []string) error {
 	if fn := builtins[args[0]]; fn != nil {
-		return fn(context.TODO(), args[1:])
+		return fn(ctx, args[1:])
 	}
 	return interp.DefaultExecHandler(2*time.Second)(ctx, args)
 }
